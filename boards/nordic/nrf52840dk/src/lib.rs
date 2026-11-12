@@ -71,6 +71,7 @@
 #![deny(missing_docs)]
 
 use capsules_core::virtualizers::virtual_alarm::MuxAlarm;
+use capsules_extra::add_one::AddOne;
 use capsules_extra::net::ieee802154::MacAddress;
 use capsules_extra::net::ipv6::ip_utils::IPAddr;
 use kernel::component::Component;
@@ -242,6 +243,7 @@ pub struct Platform {
     kv_driver: &'static KVDriver,
     scheduler: &'static SchedulerInUse,
     systick: SystickHw,
+    add_one: &'static AddOne,
 }
 
 impl SyscallDriverLookup for Platform {
@@ -264,6 +266,7 @@ impl SyscallDriverLookup for Platform {
             capsules_core::i2c_master_slave_driver::DRIVER_NUM => f(Some(self.i2c_master_slave)),
             capsules_core::spi_controller::DRIVER_NUM => f(Some(self.spi_controller)),
             capsules_extra::kv_driver::DRIVER_NUM => f(Some(self.kv_driver)),
+            capsules_extra::add_one::DRIVER_NUM => f(Some(self.add_one)),
             _ => f(None),
         }
     }
@@ -884,6 +887,17 @@ pub unsafe fn start_no_pconsole() -> (
     nrf52_components::NrfClockComponent::new(&base_peripherals.clock).finalize(());
 
     //--------------------------------------------------------------------------
+    // ADD ONE PRACTICE COMPONENT SETUP
+    //--------------------------------------------------------------------------
+
+    let add_one = components::add_one::AddOneComponent::new(
+        board_kernel,
+        capsules_extra::add_one::DRIVER_NUM,
+        create_capability!(capabilities::MemoryAllocationCapability),
+    )
+    .finalize(components::add_one_component_static!());
+
+    //--------------------------------------------------------------------------
     // USB EXAMPLES
     //--------------------------------------------------------------------------
     // Uncomment to experiment with this.
@@ -959,6 +973,7 @@ pub unsafe fn start_no_pconsole() -> (
         kv_driver,
         scheduler,
         systick: cortexm4::systick::SysTick::new_with_calibration(64000000),
+        add_one,
     };
 
     base_peripherals.adc.calibrate();

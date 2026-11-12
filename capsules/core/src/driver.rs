@@ -139,5 +139,6 @@ pub enum NUM {
 
     // Testing
     SyscallReturnTest     = 0xB0000,
+    AddOne                = 0xC0000,
 }
 }
