@@ -12,6 +12,7 @@ pub mod tutorials;
 pub mod net;
 
 pub mod adc_microphone;
+pub mod add_one;
 pub mod air_quality;
 pub mod ambient_light;
 pub mod analog_comparator;

@@ -7,6 +7,7 @@
 
 pub mod adc;
 pub mod adc_microphone;
+pub mod add_one;
 pub mod aes;
 pub mod air_quality;
 pub mod alarm;
